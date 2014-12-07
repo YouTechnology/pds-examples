@@ -1,0 +1,43 @@
+    [
+        {
+            "name": "tc.you.demo.StopLocation", 
+            "indexes": [
+                {
+                    "keys": [
+                        "pds_createdAt",
+                        "pds_pds"
+                    ], 
+                    "options": {
+                        "unique": false
+                    }
+                }
+            ], 
+            "version": "0.1", 
+            "properties": { 
+                "coordinates": {
+                    "type": "GeoJSON", 
+                    "multi": false, 
+                    "unique": false, 
+                    "required": false
+                },        
+                "arrival": {
+                    "type": "DateTime", 
+                    "multi": false, 
+                    "unique": false, 
+                    "required": true
+                },
+                "departure": {
+                    "type": "DateTime", 
+                    "multi": false, 
+                    "unique": false, 
+                    "required": false
+                },
+                "poiLabel": {
+                    "type": "Integer", 
+                    "multi": false, 
+                    "unique": false, 
+                    "required": true
+                }
+            }
+        }
+    ]

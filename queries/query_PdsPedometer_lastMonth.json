@@ -1,0 +1,21 @@
+[
+    {
+        "name": "tc.you.demo.PdsPedometer_lastMonth",
+        "type": "PdsPedometer",
+        "query": {
+            "op": "select",
+            "typeName": "PdsPedometer",
+            "qual": {
+                "startTime": { 
+                    "pds_substitution_gte": {
+                        "pds_substitution": {
+                            "pds_currentDateTimeOffset": {"units":"days", "offset": -30, "round": "dayOfMonth"}
+                        }
+                    }
+                }
+            },
+	    "props": ["startTime", "steps"],
+            "options": {}
+        }
+    }
+]

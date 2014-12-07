@@ -1,0 +1,25 @@
+[
+    {
+        "name": "tc.you.demo.ExampleType2", 
+        "version": "1", 
+        "properties": {
+            "name": {
+                "type": "String", 
+                "multi": false 
+            }, 
+            "timestamp": {
+                "type": "DateTime", 
+                "multi": false 
+            }, 
+            "dateTimeProperty": {
+                "type": "DateTime", 
+                "multi": false,
+		"default": 1 
+            }, 
+            "stringProperty": {
+                "type": "String", 
+                "multi": true
+            }
+        }
+    }
+]

@@ -1,0 +1,12 @@
+[
+    {
+        "timestamp": 1416497562,
+        "meanDay": 5000,
+        "devDay": 2000,
+        "meanWeek": 35000,
+        "devWeek": 14000,
+        "meanMonth": 150000,
+        "devMonth": 60000,
+        "scoreType": "personal"
+    }
+]

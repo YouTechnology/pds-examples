@@ -1,0 +1,67 @@
+[
+    {
+        "name": "tc.you.demo.PedometerStats", 
+        "indexes": [
+            {
+                "keys": [
+                    "timestamp", 
+                    "pds_pds"
+                ], 
+                "options": {
+                    "unique": false
+                }
+            }
+        ], 
+        "version": "0.2", 
+        "properties": { 
+            "meanDay": {
+                "type": "Real", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            },  
+            "devDay": {
+                "type": "Real", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            },
+            "meanWeek": {
+                "type": "Real", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            },
+            "devWeek": {
+                "type": "Real", 
+                "multi": false, 
+                "unique": false, 
+                "required": true
+            },
+            "meanMonth": {
+                "type": "Real", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            },
+            "devMonth": {
+                "type": "Real", 
+                "multi": false, 
+                "unique": false, 
+                "required": true
+            },
+            "scoreType": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": true
+            },
+            "timestamp": {
+                "type": "DateTime", 
+                "multi": false, 
+                "unique": false, 
+                "required": true
+            }
+        }
+    }
+]

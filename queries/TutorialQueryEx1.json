@@ -1,0 +1,27 @@
+[
+    {
+        "name": "tc.you.demo.PdsPedometer_Ex1",
+        "type": "PdsPedometer",
+
+        "query": {
+
+            "op": "select",
+
+            "typeName": "PdsPedometer",
+
+            "qual": {
+
+                "startTime": { 
+
+                    "$gte": 1416441600000, 
+
+		    "$lte": 1416960000000 
+		}
+            },
+
+	    "props" : ["steps","startTime","timestamp"],
+
+            "options": {}
+        }
+    }
+]

@@ -1,0 +1,31 @@
+    [
+        {
+            "name": "tc.you.demo.StopLocations", 
+            "indexes": [
+                {
+                    "keys": [
+                        "pds_createdAt",
+                        "pds_pds"
+                    ], 
+                    "options": {
+                        "unique": false
+                    }
+                }
+            ], 
+            "version": "0.1", 
+            "properties": { 
+                "stops": {
+                    "type": "tc.you.demo.StopLocation", 
+                    "multi": true, 
+                    "unique": false, 
+                    "required": false 
+                },
+                "date": {
+                    "type": "String", 
+                    "multi": false, 
+                    "unique": false, 
+                    "required": true
+                }
+            }
+        }
+    ]
