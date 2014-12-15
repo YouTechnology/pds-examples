@@ -1,10 +1,10 @@
     [  
           {
-            "type": "tc.you.StopLocations",
-            "name": "tc.you.StopLocations_today",
+            "type": "tc.you.demo.StopLocations",
+            "name": "tc.you.demo.StopLocations_today",
             "query": {   
                 "op": "select",
-                "typeName": "tc.you.StopLocations",
+                "typeName": "tc.you.demo.StopLocations",
                 "qual":{
                     "pds_createdAt": {
                         "pds_substitution_gte": {
