@@ -1,0 +1,22 @@
+        [  
+          {
+            "type": "PdsLocation",
+            "name": "tc.you.demo.PdsLocation_acc60_last27h",
+            "query": {   
+                "op": "select",
+                "typeName": "PdsLocation",
+                "qual":{
+                    "accuracy": {"pds_substitution_lte": 60},
+		    "timestamp": {
+                        "pds_substitution_gte": {
+                            "pds_substitution": {
+                                "pds_currentDateTimeOffset": {"units":"hours", "offset": -27}
+                            }
+                        }
+                    }
+                }, 
+            "props":["coordinates", "timestamp", "pds_createdAt", "pds_pds", "tz"],
+	    "options": {"sort":{"pds_pds":1}}
+             }  
+          }
+        ]

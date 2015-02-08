@@ -1,32 +1,20 @@
-# Copyright 2014 You Technology, Inc. or its affiliates. All Rights Reserved.
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"). You
-# may not use this file except in compliance with the License. A copy of
-# the License is located at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0.html
-# 
-# or in the "license" file accompanying this file. This file is
-# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-# ANY KIND, either express or implied. See the License for the specific
-# language governing permissions and limitations under the License.
-"""This is a 3rd iteration  of a module which: Computes Points of Interest
-   This work is based on Andrea Cuttone's thesis from DTU Compute <citation>
+"""This is a 3nd iteration  of a module which: Computes Points of Interest
+   This work is based on Andrea Cuttone's thesis from DTU IMM <citation>
    At this point it:
        resamples every 15 minutes
-       takes all available data
+       takes highg haccuracy data  (acc < 60)
        Assumes cleaned up data
+   V 0.31 : added timezone support (madule works also with missing tz data)    
+       
 
 Type: personal
  
 Input:
     
-    locations : /v1/data/PdsLocation/query/tc.you.demo.PdsLocation_acc_lte_60
-    old_stops: /v1/data/tc.you.demo.StopLocations/query/tc.you.demo.StopLocations_today
+    locations : /v1/data/PdsLocation/query/tc.you.demo.PdsLocation_acc60_last27h
  
 Output:
-    updStops: /v1/data/tc.you.demo.StopLocations, PUT
-    newStops: /v1/data/tc.you.demo.StopLocations, POST
+    newStops: /v1/data/tc.you.demo.StopLocationsDay, POST
 
 
 
@@ -47,7 +35,7 @@ def haversine(lon1, lat1, lon2, lat2):
     dlat = lat2 - lat1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * asin(sqrt(a))
-    # average radius of Earth in meters 
+    #average radius of Earth in meters is 6371000, I'm using 6367000 after Andrea cos he uses differnt fromula for c (which I don)
     distance_in_meters = 6367000 * c
     return distance_in_meters
 
@@ -74,9 +62,11 @@ def load_data_to_df(pds_locations_list):
         # row contains lon lat timestamp
         row = []
         row.extend(location['coordinates']['coordinates'])
-        row.append(location['timestamp'])
+        row.append(location['timestamp']) 
+        row.append(location.get('tz'))
+
         rows.append(row)        
-    locations_df = pd.DataFrame(rows, columns=['lon','lat','timestamp'])
+    locations_df = pd.DataFrame(rows, columns=['lon','lat','timestamp','tz'])
     locations_df['timestamp'] = pd.to_datetime(locations_df['timestamp'],unit='ms')
     return locations_df
 #ancillary function grouping consecutive readouts (achieved by iteration over readouts) within a 60m radius (achieved by distanceCondiditonF)
@@ -88,7 +78,7 @@ def resample_locations (location_df):
     Im: locations dataframe (with timestamp in datetime format)
     Out: dataframe resampled to 15 mins intervals
     """
-    resampled_df = location_df.set_index('timestamp').resample('15min', how='median').dropna()
+    resampled_df = location_df.set_index('timestamp').resample('15min', how='median').dropna(subset=location_df.columns[0:2]) 
     resampled_df['timestamp'] = resampled_df.index
     return resampled_df
 
@@ -120,8 +110,9 @@ def group_locations(locations_df, distanceCondiditonF):
 
 ################################################################# main function
 
-def execute(locations, old_stops, *args, **kwargs):
-    
+def execute(locations, *args, **kwargs):
+    if len(locations) == 0: return {'newStops':[]}   
+
     # grouping , stop and clustering parameters declaration
     group_radius = 60        
     min_time_spent_in_stop = 60  #sec
@@ -130,22 +121,24 @@ def execute(locations, old_stops, *args, **kwargs):
     #load data to a dataframe and resample to 15 min intervals
     locations_df = load_data_to_df(locations)
     resampled_df = resample_locations(locations_df)
-    
+
     #pools locations into chronological groups of radious 60m (group_radius) (hardcode this lambda into group_locations)
     #haversine (start, next  ) start and next refer to the integer values passed by group_locations function 
     groups = group_locations(resampled_df, lambda first_location, next_location: 
-        haversine(locations_df['lon'].values[first_location],locations_df['lat'].values[first_location], 
-        locations_df['lon'].values[next_location],locations_df['lat'].values[next_location]) <= group_radius)
+        haversine(resampled_df['lon'].values[first_location],resampled_df['lat'].values[first_location], 
+        resampled_df['lon'].values[next_location],resampled_df['lat'].values[next_location]) <= group_radius)
     
-    # filter the stop locations ie. locations with time spent > min_imte_spent_in_stop witch is 1 miute
+    # filter the stop locations ie. locations with time spent > min_imte_spent_in_stop witch is 1 minute
     stop_locations = []
     values = []
     for group in groups:
         # median lon, lat for group and first, last timestamps
-        values.append([group.lon.median(), group.lat.median(), group.timestamp.values[0], group.timestamp.values[-1]])
-        stop_locations = pd.DataFrame(values, columns=['lon', 'lat', 'arrival', 'departure'])
-        stop_locations = stop_locations[stop_locations.departure - stop_locations.arrival >= min_time_spent_in_stop]
-       
+        values.append([group.lon.median(), group.lat.median(), group.timestamp.values[0], group.timestamp.values[-1], group.tz.min()])
+    
+    stop_locations = pd.DataFrame(values, columns=['lon', 'lat', 'arrival', 'departure','tz'])
+    stop_locations = stop_locations[stop_locations.departure - stop_locations.arrival >= min_time_spent_in_stop]
+    
+    if len(stop_locations) == 0: return {'newStops':[{'date':datetime.date.today().strftime("%Y-%m-%d")}]}   
 
     # initialize the DBSCAN object
     db = DBSCAN(eps=60, min_samples=1, metric=haversine_metric)
@@ -155,7 +148,7 @@ def execute(locations, old_stops, *args, **kwargs):
     db.fit(stop_coordinates)
     
     ############################################################## preparing the outup for pds
-    # create a data frame with each stop_location 
+    # quite complex way to convert pandas datetime to epoch millis 
     stop_locations['poiLabel'] = db.labels_
     arrival_tmp = pd.DatetimeIndex(stop_locations['arrival'])
     arrival_tmp = arrival_tmp.to_pydatetime()
@@ -166,26 +159,19 @@ def execute(locations, old_stops, *args, **kwargs):
     departure_tmp  = map(lambda x: round(time.mktime(x.timetuple())*1000), departure_tmp )  #converts to epoch
     stop_locations['departure'] = departure_tmp
 
-    # creates  a list of stop locations labeld with poi they belong to, each of the stop locations is as the stopLocation schema
-    stops_list = [{"coordinates" : {"type": "Point", "coordinates":[float(stop_locations.iloc[row,0]), float(stop_locations.iloc[row,1])]}, "arrival":int(stop_locations.iloc[row,2]), "departure":int(stop_locations.iloc[row,3]), "poiLabel":int(stop_locations.iloc[row,4])} for row in range(len(stop_locations))]
-                     
-        
+    # change NaN to None
+    s_l = stop_locations.where((pd.notnull(stop_locations)), None) 
     
-    # wraps the stop locations into a single object with date specified,
-    # this object holds calculations made that day, and is updated during ecach run of the module that day
-    # note that it does not contains stops from that day only, but rather all stops since the data have been collected
-   
-    # if first run of module today (ie. stopLocations object for today haven't been created yet = nput lenght 0) POST a new -  newStops
-    # if it is avsubsequent run (ie. input lenght 1) PUT update - oldStops
-    new_stops = []
-    if len(old_stops) == 0:
-        old_stops = []
-        new_stops = [{'date': time.strftime("%Y-%m-%d"), 'stops': stops_list}]
+    # convert the df into a list of dictionaires 
+    stops_list = [{"coordinates" : {"type": "Point", "coordinates":[float(s_l.iloc[row,0]), float(s_l.iloc[row,1])]}, "arrival":int(s_l.iloc[row,2]), "departure":int(s_l.iloc[row,3]), "tz": s_l.iloc[row,4] ,"poiLabel":int(s_l.iloc[row,5])} for row in range(len(s_l))]
+    # convert tz into int
+    for stop in stops_list:
+        if stop['tz'] is not None:
+            stop['tz'] = int(stop['tz'])
         
-    elif len(old_stops) == 1:  
-        old_stops[0]['stops'] = stops_list 
-        new_stops = []
-    # add else (query returned more then than it should ie. more then 1 object): rise an execption
+    answer= {'timestamp': int(time.time()*1000),
+	     'date': datetime.date.today().strftime("%Y-%m-%d"),
+	     'stops': stops_list
+    }
         
-    #newStops = new Stops object (first one for this day)
-    return dict(updStops=old_stops, newStops=new_stops)
+    return dict(newStops=[answer])
