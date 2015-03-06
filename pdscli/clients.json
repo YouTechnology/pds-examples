@@ -5,8 +5,8 @@
       "developer", 
       "user"
     ], 
-    "name": "tc.you.demo.MyClient", 
-    "clientId": "a671d261-dc68-484d-946b-9cff8cca729b", 
+    "name": "My Client", 
+    "clientId": "tc.you.demo.a671d261-dc68-484d-946b-9cff8cca729b", 
     "secret": "13a11b48-e146-4e6c-ba23-03b8701706b0", 
     "expireDuration": 86400000, 
     "clientCredentialsAllowed": false, 

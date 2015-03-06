@@ -37,10 +37,11 @@ def execute(stepCounts, stats, *args, **kwargs):
     now = 1416960000000 # end of custom query data
     oneDay = 3600*24*1000
     totals = [{ "start": now, "total": 0}, { "start": now - 7*oneDay, "total": 0}, {"start": now - 30*oneDay, "total": 0}]
-    stepStarts = [s["startTime"] for s in stepCounts]
     
     # Add step counts to intervals they occur in
+    stepStarts = []
     for counts in stepCounts:
+        stepStarts.append(counts["startTime"])
         for total in totals:
             if counts["startTime"] > total["start"]:
                 total["total"] += counts["steps"]
@@ -56,5 +57,3 @@ def execute(stepCounts, stats, *args, **kwargs):
     answer["scoreMonth"] = 100.0 * CDF(totals[2]["total"], personalStats["meanMonth"], personalStats["devMonth"])    
     
     return dict(score=[answer])
-    
-    
