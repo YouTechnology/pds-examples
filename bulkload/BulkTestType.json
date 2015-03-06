@@ -1,0 +1,67 @@
+[
+    {
+        "name": "tc.you.demo.BulkTestType", 
+        "indexes": [
+            {
+                "keys": [
+                    "name", 
+                    "pds_pds"
+                ], 
+                "options": {
+                    "unique": false
+                }
+                
+            }
+        ], 
+        "version": "1", 
+        "properties": {
+            "name": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": true
+            }, 
+            "phoneNumber": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }, 
+            "location": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }, 
+            "address": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }, 
+            "city": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }, 
+            "province": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }, 
+            "country": {
+                "type": "String", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }
+        },
+        "writeScopes": [
+            "developer",
+            "collector"
+        ],
+        "rawData": true
+    }
+]
