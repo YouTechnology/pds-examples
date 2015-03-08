@@ -9,7 +9,6 @@ Example files for the PDS tutorials.
 * [locations](locations) -- module which calculates "points of interest" using data from the location trace probe.
 * [pdscli](pdscli) -- files for the [PDS command line tutorial](http://developer.you.tc/doc/commandLine/cmdTutorial/).
 * [queries](queries) -- query examples
-* [simple](simple) -- very simple answer module
 * [types](types) -- type definition examples
 
 ## License

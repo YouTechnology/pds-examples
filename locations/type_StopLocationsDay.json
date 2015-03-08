@@ -1,11 +1,19 @@
     [
         {
-            "name": "tc.you.demo.StopLocations", 
+            "name": "tc.you.demo.StopLocationsDay", 
             "indexes": [
                 {
                     "keys": [
                         "pds_createdAt",
                         "pds_pds"
+                    ], 
+                    "options": {
+                        "unique": false
+                    }
+                },
+                {
+                    "keys": [
+                        "date"
                     ], 
                     "options": {
                         "unique": false
@@ -25,6 +33,11 @@
                     "multi": false, 
                     "unique": false, 
                     "required": true
+                },
+                "timestamp": {
+                    "type": "DateTime", 
+                    "multi": false, 
+                    "unique": false
                 }
             }
         }
