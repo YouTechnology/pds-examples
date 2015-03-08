@@ -131,6 +131,8 @@ def execute(locations, *args, **kwargs):
     clustering_distance = 60
     
     #load data to a dataframe and resample to 15 min intervals
+    # Note... this does not scale over large input sets.  To make ths work we would need to
+    # process the data in fixed sized batches to ensure we don't consume too much memory.
     locations_df = load_data_to_df(locations)
     resampled_df = resample_locations(locations_df)
 

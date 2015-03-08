@@ -27,16 +27,20 @@ Output:
 import time
 
 def execute(messages, *args, **kwargs):
-    # Count the unique PDSs 
-    pdss = set([message['pds_pds'] for  message in messages])
-    pds_count = len(pdss)
-
+    # Process messages, counting total and noting the unique PDSs.
+    # Note that the PDS count won't scale over large input streams...
+    msg_count = 0
+    pdss = set()
+    for msg in messages:
+        msg_count += 1
+        pdss.add(msg['pds_pds'])
+    
     # Calculate the mean number of SMSs
-    mean_count = len(messages) / pds_count
+    pds_count = len(pdss)
+    mean_count = msg_count / pds_count
 
     # Prepare output
     aggregate = {'timestamp': int((time.time() + 0.5) * 1000), 
-		 'participantsCount': pds_count,
-		 'meanSMSCount': mean_count}
-    
+		         'participantsCount': pds_count,
+		         'meanSMSCount': mean_count}
     return dict(out1=[aggregate])

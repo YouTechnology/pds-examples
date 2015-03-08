@@ -8,7 +8,7 @@
                     "pds_pds"
                 ], 
                 "options": {
-                    "unique": true
+                    "unique": false
                 }
             }
         ], 
@@ -79,6 +79,24 @@
                 "multi": false, 
                 "unique": false, 
                 "required": false
+            }
+        }
+    },
+    {
+        "name": "tc.you.demo.WifiCount", 
+        "version": "1", 
+        "properties": {
+            "count": {
+                "type": "Integer", 
+                "multi": false, 
+                "unique": false, 
+                "required": false
+            }, 
+            "timestamp": {
+                "type": "DateTime", 
+                "multi": false, 
+                "unique": false, 
+                "required": true
             }
         }
     }
